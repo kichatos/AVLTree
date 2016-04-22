@@ -1,166 +1,124 @@
 package avltree;
 
-public class AVLTree<T extends Comparable<T>> {
-    private static class AVLNode<T extends Comparable<T>> {
-        private T value;
-        private int childrenCount;
-        private int height;
-        private AVLNode<T> left;
-        private AVLNode<T> right;
 
-        public AVLNode(T value) {
-            this.value = value;
-            height = 1;
-            childrenCount = 0;
-            left = null;
-            right = null;
-        }
+import java.util.AbstractCollection;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-        private static <T extends Comparable<T>> int getHeight(AVLNode<T> node) {
-            return node == null ? 0 : node.height;
-        }
-
-        private static <T extends Comparable<T>> int getBalanceFactor(AVLNode<T> node) {
-            return node == null ? 0 : getHeight(node.right) - getHeight(node.left);
-        }
-
-        public static <T extends Comparable<T>> int getNodeCount(AVLNode<T> node) {
-            return node == null ? 0 : node.childrenCount + 1;
-        }
-
-        private static <T extends Comparable<T>> void update(AVLNode<T> node) {
-            node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
-            node.childrenCount = getNodeCount(node.left) + getNodeCount(node.right);
-        }
-
-        private static <T extends Comparable<T>> AVLNode<T> rotateRight(AVLNode<T> p) {
-            AVLNode<T> q = p.left;
-            p.left = q.right;
-            q.right = p;
-            update(p);
-            update(q);
-            return q;
-        }
-
-        private static <T extends Comparable<T>> AVLNode<T> rotateLeft(AVLNode<T> q) {
-            AVLNode<T> p = q.right;
-            q.right = p.left;
-            p.left = q;
-            update(q);
-            update(p);
-            return p;
-        }
-
-        private static <T extends Comparable<T>> AVLNode<T> balance(AVLNode<T> p) {
-            update(p);
-
-            if (getBalanceFactor(p) == 2) {
-                if (getBalanceFactor(p.right) < 0) {
-                    p.right = rotateRight(p.right);
-                }
-
-                return rotateLeft(p);
-            }
-
-            if (getBalanceFactor(p) == -2) {
-                if (getBalanceFactor(p.left) > 0) {
-                    p.left = rotateLeft(p.left);
-                }
-
-                return rotateRight(p);
-            }
-
-            return p;
-        }
-
-        private static <T extends Comparable<T>> AVLNode<T> insert(AVLNode<T> p, T value) {
-            if (p == null) {
-                return new AVLNode<T>(value);
-            }
-
-            if (value.compareTo(p.value) < 0) {
-                p.left = insert(p.left, value);
-            } else {
-                p.right = insert(p.right, value);
-            }
-
-            return balance(p);
-        }
-
-        private static <T extends Comparable<T>> AVLNode<T> findMin(AVLNode<T> p) {
-            return p.left == null ? p : findMin(p.left);
-        }
-
-        private static <T extends Comparable<T>> AVLNode<T> removeMin(AVLNode<T> p) {
-            if (p.left == null) {
-                return p.right;
-            }
-
-            p.left = removeMin(p.left);
-            return balance(p);
-        }
-
-        private static <T extends Comparable<T>> AVLNode<T> remove(AVLNode<T> p, T value) {
-            if (p == null) {
-                return null;
-            }
-
-            if (value.compareTo(p.value) < 0) {
-                p.left = remove(p.left, value);
-            } else if (value.compareTo(p.value) > 0) {
-                p.right = remove(p.right, value);
-            } else {
-                AVLNode<T> q = p.left;
-                AVLNode<T> r = p.right;
-
-                if (r == null) {
-                    return q;
-                }
-
-                AVLNode<T> min = findMin(r);
-                min.right = removeMin(r);
-                min.left = q;
-                return balance(min);
-            }
-
-            return balance(p);
-        }
-
-        private static <T extends Comparable<T>> T kthElement(AVLNode<T> node, int k) {
-            if (k <= 0 || k > getNodeCount(node)) {
-                return null;
-            }
-
-            if (k == getNodeCount(node.left) + 1) {
-                return node.value;
-            } else {
-                return k < getNodeCount(node.left) + 1 ? kthElement(node.left, k) :
-                        kthElement(node.right, k - getNodeCount(node.left) - 1);
-            }
-        }
+public class AVLTree<E extends Comparable<E>> extends AbstractCollection<E> implements Collection<E> {
+    public int size() {
+        return AVLNode.getNodeCount(head);
     }
 
-    private AVLNode<T> head;
+    AVLNode<E> head;
 
     public AVLTree() {
         head = null;
     }
 
-    public void insert(T value) {
-        if (head == null) {
-            head = new AVLNode<T>(value);
-        } else {
-            head = AVLNode.insert(head, value);
+    public AVLTree(AVLNode<E> head) {
+        this.head = head;
+    }
+
+    public AVLTree(Collection<? extends E> c) {
+        this.addAll(c);
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new Itr();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            E e = (E) o;
+            return AVLNode.find(head, e) != null;
+        }
+        catch (ClassCastException e) {
+            return false;
         }
     }
 
-    public void remove(T value) {
-        if (head != null) {
-            head = AVLNode.remove(head, value);
+    @Override
+    public boolean remove(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            E e = (E) o;
+            int prevSize = this.size();
+            head = AVLNode.remove(head, e);
+            return prevSize != this.size();
+        }
+        catch (ClassCastException e) {
+            return false;
         }
     }
 
-    public T kthElement(int k) {
-        return AVLNode.kthElement(head, k);
+    @Override
+    public boolean add(E e) {
+        int prevSize = this.size();
+        head = AVLNode.insert(head, e);
+        return prevSize != this.size();
+    }
+
+    public E get(int index) {
+        if (index < 0 || index >= this.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return AVLNode.get(head, index);
+    }
+
+    private class Itr implements Iterator<E> {
+        AVLNode<E> start = AVLNode.findMin(head);
+        AVLNode<E> next = start;
+
+        int startingSize = AVLTree.this.size();
+        int moveCount;
+
+        boolean moved;
+
+        @Override
+        public boolean hasNext() {
+            return moveCount < startingSize;
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            next = next.next;
+            ++moveCount;
+            moved = true;
+            return next.prev.value;
+        }
+
+        @Override
+        public void remove() {
+            if (!moved) {
+                throw new IllegalStateException();
+            }
+
+            if (next != null) {
+                head = AVLNode.remove(head, next.prev.value);
+            }
+            else {
+                head = null;
+            }
+
+            moved = false;
+        }
     }
 }
