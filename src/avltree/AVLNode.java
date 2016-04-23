@@ -1,5 +1,8 @@
 package avltree;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AVLNode<T extends Comparable<T>> {
     public static final int MIN_BALANCE_FACTOR = -1;
     public static final int MAX_BALANCE_FACTOR = 1;
@@ -264,17 +267,78 @@ public class AVLNode<T extends Comparable<T>> {
         }
 
         AVLNode<T> head = findMin(right);
-        AVLNode.setNext(findMax(left), head);
-        AVLNode.setNext(findMax(right), findMin(left));
-        AVLNode.setRight(head, removeMin(right));
-        AVLNode.setLeft(head, left);
+        setNext(findMax(left), head);
+        setNext(findMax(right), findMin(left));
+        setRight(head, removeMin(right));
+        setLeft(head, left);
+        head.parent = null;
 
-        AVLNode.update(head);
-        while (!AVLNode.isBalanced(head)) {
-            head = balance(head);
+        return balanceBranch(head);
+    }
+
+    public static <T extends Comparable<T>> List<AVLNode<T>> split(AVLNode<T> head, T value, boolean valueLeft) {
+        if (head == null) {
+            List<AVLNode<T>> res = new ArrayList<>();
+            res.add(null);
+            res.add(null);
+            return res;
         }
 
-        return head;
+        AVLNode<T> min = findMin(head);
+        AVLNode<T> max = findMax(head);
+        AVLNode<T> left = null;
+        AVLNode<T> right = null;
+        AVLNode<T> node = head;
+        while (node != null) {
+            int cmp = value.compareTo(node.value);
+            if (cmp < 0 || cmp == 0 && !valueLeft) {
+                if (right == null) {
+                    node.parent = null;
+                }
+                else {
+                    setLeft(right, node);
+                }
+
+                right = node;
+                node = node.left;
+            }
+            else {
+                if (left == null) {
+                    node.parent = null;
+                }
+                else {
+                    setRight(left, node);
+                }
+
+                left = node;
+                node = node.right;
+            }
+        }
+
+        setNext(left, min);
+        setNext(max, right);
+        setRight(left, null);
+        setLeft(right, null);
+        List<AVLNode<T>> res = new ArrayList<>();
+        res.add(balanceBranch(left));
+        res.add(balanceBranch(right));
+        return res;
+    }
+
+    public static <T extends Comparable<T>> AVLNode<T> balanceBranch(AVLNode<T> node) {
+        AVLNode<T> last = node;
+        while (node != null) {
+            update(node);
+            while (!isBalanced(node)) {
+                replaceSon(node.parent, node, balance(node));
+            }
+
+            last = node;
+            node = node.parent;
+        }
+
+        update(last);
+        return last;
     }
 
     public static <T extends Comparable<T>> T get(AVLNode<T> node, int index) {

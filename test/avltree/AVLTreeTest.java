@@ -23,12 +23,8 @@ public class AVLTreeTest {
         return res;
     }
 
-    static <T extends Comparable<T>> boolean nodeIsBalanced(AVLNode<T> node) {
-        return node == null || AVLNode.isBalanced(node) && nodeIsBalanced(node.left) && nodeIsBalanced(node.right);
-    }
-
     static <T extends Comparable<T>> boolean treeIsBalanced(AVLTree<T> tree) {
-        return nodeIsBalanced(tree.head);
+        return AVLNodeTest.nodeIsBalanced(tree.head);
     }
 
     @Test
@@ -173,6 +169,110 @@ public class AVLTreeTest {
         for (Integer elem : joined) {
             assertEquals(++i, elem);
         }
+    }
+
+    @Test
+    public void retainInterval() throws Exception {
+        Integer min = 0;
+        Integer max = 1 << 10;
+
+        AVLTree<Integer> tree = new AVLTree<>();
+        for (Integer i = min; i <= max; ++i) {
+            tree.add(i);
+        }
+
+        min = 22;
+        max = 513;
+        tree.retainSegment(min, max);
+        assertTrue(treeIsBalanced(tree));
+        assertEquals(tree.size(), max - min + 1);
+
+        Integer i = min;
+        for (Integer elem : tree) {
+            assertEquals(i++, elem);
+        }
+    }
+
+    @Test
+    public void retainOverlappingInterval() throws Exception {
+        Integer min = 0;
+        Integer max = 1 << 10;
+
+        AVLTree<Integer> tree = new AVLTree<>();
+        for (Integer i = min; i <= max; ++i) {
+            tree.add(i);
+        }
+
+        Integer size = tree.size();
+
+        Integer l = 22;
+        Integer r = 513;
+        tree.retainSegment(r, l);
+        assertTrue(treeIsBalanced(tree));
+        assertEquals(tree.size(), size - (r - l - 1));
+
+        Iterator<Integer> iterator = tree.iterator();
+        for (Integer i = min; i <= l; ++i) {
+            assertEquals(i, iterator.next());
+        }
+
+        for (Integer i = r; i <= max; ++i) {
+            assertEquals(i, iterator.next());
+        }
+
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    public void removeOverlappingInterval() throws Exception {
+        Integer min = 0;
+        Integer max = 1 << 10;
+
+        AVLTree<Integer> tree = new AVLTree<>();
+        for (Integer i = min; i <= max; ++i) {
+            tree.add(i);
+        }
+
+        min = 22;
+        max = 513;
+        tree.removeInterval(max, min);
+        assertTrue(treeIsBalanced(tree));
+        assertEquals(tree.size(), max - min + 1);
+
+        Integer i = min;
+        for (Integer elem : tree) {
+            assertEquals(i++, elem);
+        }
+    }
+
+    @Test
+    public void removeInterval() throws Exception {
+        Integer min = 0;
+        Integer max = 1 << 10;
+
+        AVLTree<Integer> tree = new AVLTree<>();
+        for (Integer i = min; i <= max; ++i) {
+            tree.add(i);
+        }
+
+        Integer size = tree.size();
+
+        Integer l = 22;
+        Integer r = 513;
+        tree.removeInterval(l, r);
+        assertTrue(treeIsBalanced(tree));
+        assertEquals(tree.size(), size - (r - l - 1));
+
+        Iterator<Integer> iterator = tree.iterator();
+        for (Integer i = min; i <= l; ++i) {
+            assertEquals(i, iterator.next());
+        }
+
+        for (Integer i = r; i <= max; ++i) {
+            assertEquals(i, iterator.next());
+        }
+
+        assertFalse(iterator.hasNext());
     }
 
     @Test

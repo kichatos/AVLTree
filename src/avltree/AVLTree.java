@@ -1,10 +1,7 @@
 package avltree;
 
 
-import java.util.AbstractCollection;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class AVLTree<E extends Comparable<E>> extends AbstractCollection<E> implements Collection<E> {
     public int size() {
@@ -38,7 +35,19 @@ public class AVLTree<E extends Comparable<E>> extends AbstractCollection<E> impl
     }
 
     public void retainInterval(E min, E max, boolean minOpen, boolean maxOpen) {
-        throw new UnsupportedOperationException();
+        if (min == null || max == null) {
+            throw new NullPointerException();
+        }
+
+        if (min.compareTo(max) > 0) {
+            removeInterval(max, min, !maxOpen, !minOpen);
+            return;
+        }
+
+        List<AVLNode<E>> minList = AVLNode.split(head, min, minOpen);
+        head = minList.get(1);
+        List<AVLNode<E>> maxList = AVLNode.split(head, max, !maxOpen);
+        head = maxList.get(0);
     }
 
     public void retainSegment(E min, E max) {
@@ -50,7 +59,19 @@ public class AVLTree<E extends Comparable<E>> extends AbstractCollection<E> impl
     }
 
     public void removeInterval(E min, E max, boolean minOpen, boolean maxOpen) {
-        throw new UnsupportedOperationException();
+        if (min == null || max == null) {
+            throw new NullPointerException();
+        }
+
+        if (min.compareTo(max) > 0) {
+            retainInterval(max, min, !maxOpen, !minOpen);
+            return;
+        }
+
+        List<AVLNode<E>> minList = AVLNode.split(head, min, minOpen);
+        head = minList.get(1);
+        List<AVLNode<E>> maxList = AVLNode.split(head, max, !maxOpen);
+        head = AVLNode.join(minList.get(0), maxList.get(1));
     }
 
     public void removeSegment(E min, E max) {
