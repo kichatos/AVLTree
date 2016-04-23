@@ -8,12 +8,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class AVLNodeTest {
-    static <T extends Comparable<T>> boolean nodeIsBalanced(AVLNode<T> node) {
+    static <T extends Comparable<T>> boolean nodeIsBalanced(AVLTree.AVLNode<T> node) {
         if (node == null) {
             return true;
         }
 
-        boolean nodeBalanced = AVLNode.isBalanced(node);
+        boolean nodeBalanced = AVLTree.AVLNode.isBalanced(node);
         return nodeBalanced && nodeIsBalanced(node.left) && nodeIsBalanced(node.right);
     }
 
@@ -29,12 +29,12 @@ public class AVLNodeTest {
         int size = tree.size();
 
         int splitPoint = 22;
-        List<AVLNode<Integer>> list = AVLNode.split(tree.head, splitPoint, true);
-        AVLNode<Integer> left = list.get(0);
-        AVLNode<Integer> right = list.get(1);
+        List<AVLTree.AVLNode<Integer>> list = tree.split(tree.head, splitPoint, true);
+        AVLTree.AVLNode<Integer> left = list.get(0);
+        AVLTree.AVLNode<Integer> right = list.get(1);
 
-        assertEquals(AVLNode.getNodeCount(left), splitPoint + 1);
-        assertEquals(AVLNode.getNodeCount(right), size - splitPoint - 1);
+        assertEquals(AVLTree.AVLNode.getNodeCount(left), splitPoint + 1);
+        assertEquals(AVLTree.AVLNode.getNodeCount(right), size - splitPoint - 1);
         assertTrue(nodeIsBalanced(left));
         assertTrue(nodeIsBalanced(right));
     }
