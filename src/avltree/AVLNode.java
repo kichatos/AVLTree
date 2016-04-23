@@ -113,6 +113,10 @@ public class AVLNode<T extends Comparable<T>> {
     }
 
     private static <T extends Comparable<T>> void update(AVLNode<T> node) {
+        if (node == null) {
+            return;
+        }
+
         node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
         node.childrenCount = getNodeCount(node.left) + getNodeCount(node.right);
     }
@@ -140,7 +144,7 @@ public class AVLNode<T extends Comparable<T>> {
     private static <T extends Comparable<T>> AVLNode<T> balance(AVLNode<T> p) {
         update(p);
 
-        if (getBalanceFactor(p) == 2) {
+        if (getBalanceFactor(p) > MAX_BALANCE_FACTOR) {
             if (getBalanceFactor(p.right) < 0) {
                 AVLNode.setRight(p, rotateRight(p.right));
             }
@@ -148,7 +152,7 @@ public class AVLNode<T extends Comparable<T>> {
             return rotateLeft(p);
         }
 
-        if (getBalanceFactor(p) == -2) {
+        if (getBalanceFactor(p) < MIN_BALANCE_FACTOR) {
             if (getBalanceFactor(p.left) > 0) {
                 AVLNode.setLeft(p, rotateLeft(p.left));
             }
@@ -187,7 +191,15 @@ public class AVLNode<T extends Comparable<T>> {
         return p == null || p.left == null ? p : findMin(p.left);
     }
 
+    public static <T extends Comparable<T>> AVLNode<T> findMax(AVLNode<T> p) {
+        return p == null || p.right == null ? p : findMax(p.right);
+    }
+
     private static <T extends Comparable<T>> AVLNode<T> removeMin(AVLNode<T> p) {
+        if (p == null) {
+            return null;
+        }
+
         if (p.left == null) {
             return p.right;
         }
@@ -242,6 +254,29 @@ public class AVLNode<T extends Comparable<T>> {
         return balance(p);
     }
 
+    public static <T extends Comparable<T>> AVLNode<T> join(AVLNode<T> left, AVLNode<T> right) {
+        if (left == null) {
+            return right;
+        }
+
+        if (right == null) {
+            return left;
+        }
+
+        AVLNode<T> head = findMin(right);
+        AVLNode.setNext(findMax(left), head);
+        AVLNode.setNext(findMax(right), findMin(left));
+        AVLNode.setRight(head, removeMin(right));
+        AVLNode.setLeft(head, left);
+
+        AVLNode.update(head);
+        while (!AVLNode.isBalanced(head)) {
+            head = balance(head);
+        }
+
+        return head;
+    }
+
     public static <T extends Comparable<T>> T get(AVLNode<T> node, int index) {
         if (index < 0 || index >= getNodeCount(node)) {
             throw new IndexOutOfBoundsException();
@@ -253,5 +288,10 @@ public class AVLNode<T extends Comparable<T>> {
             return index < getNodeCount(node.left) ? get(node.left, index) :
                     get(node.right, index - getNodeCount(node.left) - 1);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Node: " + value;
     }
 }

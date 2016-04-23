@@ -25,6 +25,42 @@ public class AVLTree<E extends Comparable<E>> extends AbstractCollection<E> impl
         this.addAll(c);
     }
 
+    public static <E extends Comparable<E>> AVLTree<E> join(AVLTree<E> left, AVLTree<E> right) {
+        if (left == null) {
+            return right;
+        }
+
+        if (right == null) {
+            return left;
+        }
+
+        return new AVLTree<>(AVLNode.join(left.head, right.head));
+    }
+
+    public void retainInterval(E min, E max, boolean minOpen, boolean maxOpen) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void retainSegment(E min, E max) {
+        this.retainInterval(min, max, false, false);
+    }
+
+    public void retainInterval(E min, E max) {
+        this.retainInterval(min, max, true, true);
+    }
+
+    public void removeInterval(E min, E max, boolean minOpen, boolean maxOpen) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeSegment(E min, E max) {
+        this.removeInterval(min, max, false, false);
+    }
+
+    public void removeInterval(E min, E max) {
+        this.removeInterval(min, max, true, true);
+    }
+
     @Override
     public Iterator<E> iterator() {
         return new Itr();

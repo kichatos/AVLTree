@@ -23,11 +23,11 @@ public class AVLTreeTest {
         return res;
     }
 
-    private <T extends Comparable<T>> boolean nodeIsBalanced(AVLNode<T> node) {
+    static <T extends Comparable<T>> boolean nodeIsBalanced(AVLNode<T> node) {
         return node == null || AVLNode.isBalanced(node) && nodeIsBalanced(node.left) && nodeIsBalanced(node.right);
     }
 
-    private <T extends Comparable<T>> boolean treeIsBalanced(AVLTree<T> tree) {
+    static <T extends Comparable<T>> boolean treeIsBalanced(AVLTree<T> tree) {
         return nodeIsBalanced(tree.head);
     }
 
@@ -155,6 +155,24 @@ public class AVLTreeTest {
 
         thrown.expect(IndexOutOfBoundsException.class);
         tree.get(-2);
+    }
+
+    @Test
+    public void join() throws Exception {
+        Integer[] leftArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+        AVLTree<Integer> left = new AVLTree<>(Arrays.asList(leftArray));
+
+        Integer[] rightArray = {17, 18, 19};
+        AVLTree<Integer> right = new AVLTree<>(Arrays.asList(rightArray));
+
+        AVLTree<Integer> joined = AVLTree.join(left, right);
+        assertEquals(joined.size(), leftArray.length + rightArray.length);
+        assertTrue(treeIsBalanced(joined));
+
+        Integer i = 0;
+        for (Integer elem : joined) {
+            assertEquals(++i, elem);
+        }
     }
 
     @Test
