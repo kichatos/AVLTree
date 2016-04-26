@@ -24,7 +24,7 @@ public class AVLTree<E> extends AbstractCollection<E> implements Collection<E> {
         this.head = head;
     }
 
-    public AVLTree(AVLNode<E> head, Comparator<E> comparator) {
+    public AVLTree(AVLNode<E> head, Comparator<? super E> comparator) {
         this.comparator = comparator;
         this.head = head;
     }
@@ -34,7 +34,7 @@ public class AVLTree<E> extends AbstractCollection<E> implements Collection<E> {
         this.addAll(c);
     }
 
-    public AVLTree(Collection<? extends E> c, Comparator<E> comparator) {
+    public AVLTree(Collection<? extends E> c, Comparator<? super E> comparator) {
         this.comparator = comparator;
         this.addAll(c);
     }
@@ -59,7 +59,7 @@ public class AVLTree<E> extends AbstractCollection<E> implements Collection<E> {
         return AVLNode.getNodeCount(head);
     }
 
-    public static <E extends Comparable<E>> AVLTree<E> join(AVLTree<E> left, AVLTree<E> right) {
+    public static <E> AVLTree<E> join(AVLTree<E> left, AVLTree<E> right) {
         if (left == null) {
             return right;
         }
@@ -68,7 +68,7 @@ public class AVLTree<E> extends AbstractCollection<E> implements Collection<E> {
             return left;
         }
 
-        return new AVLTree<>(AVLNode.join(left.head, right.head));
+        return new AVLTree<>(AVLNode.join(left.head, right.head), left.getComparator());
     }
 
     public void retainInterval(E min, E max, boolean minOpen, boolean maxOpen) {
@@ -77,7 +77,10 @@ public class AVLTree<E> extends AbstractCollection<E> implements Collection<E> {
         }
 
         if (comparator.compare(min, max) > 0) {
-            removeInterval(max, min, !maxOpen, !minOpen);
+            List<AVLNode<E>> maxList = split(head, max, !maxOpen);
+            head = maxList.get(1);
+            List<AVLNode<E>> minList = split(head, min, minOpen);
+            head = AVLNode.join(minList.get(1), maxList.get(0));
             return;
         }
 

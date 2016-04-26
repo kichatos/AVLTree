@@ -236,11 +236,11 @@ public class AVLTreeTest {
         assertEquals(tree.size(), size - (r - l - 1));
 
         Iterator<Integer> iterator = tree.iterator();
-        for (Integer i = min; i <= l; ++i) {
+        for (Integer i = r; i <= max; ++i) {
             assertEquals(i, iterator.next());
         }
 
-        for (Integer i = r; i <= max; ++i) {
+        for (Integer i = min; i <= l; ++i) {
             assertEquals(i, iterator.next());
         }
 
