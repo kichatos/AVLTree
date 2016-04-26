@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -154,7 +155,7 @@ public class AVLTreeTest {
     }
 
     @Test
-    public void join() throws Exception {
+    public void joinBalance() throws Exception {
         Integer[] leftArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
         AVLTree<Integer> left = new AVLTree<>(Arrays.asList(leftArray));
 
@@ -168,6 +169,29 @@ public class AVLTreeTest {
         Integer i = 0;
         for (Integer elem : joined) {
             assertEquals(++i, elem);
+        }
+    }
+
+    @Test
+    public void joinSimple() throws Exception {
+        Integer[] points = {0, 1, 23, 32, 44};
+        ArrayList<AVLTree<Integer>> trees = new ArrayList<>();
+        for (int i = 0; i < 5; ++i) {
+            trees.add(new AVLTree<>(new AVLNode<Integer>(points[i])));
+        }
+
+        trees.set(0, AVLTree.join(trees.get(0), trees.get(1)));
+        assertTrue(treeIsBalanced(trees.get(0)));
+        trees.set(2, AVLTree.join(trees.get(2), trees.get(3)));
+        assertTrue(treeIsBalanced(trees.get(2)));
+        trees.set(2, AVLTree.join(trees.get(2), trees.get(4)));
+        assertTrue(treeIsBalanced(trees.get(2)));
+        trees.set(0, AVLTree.join(trees.get(0), trees.get(2)));
+        assertTrue(treeIsBalanced(trees.get(0)));
+
+        int i = 0;
+        for (Integer elem : trees.get(0)) {
+            assertEquals(elem, points[i++]);
         }
     }
 
