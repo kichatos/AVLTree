@@ -61,7 +61,7 @@ public class AVLTree<E> extends AbstractCollection<E> implements Collection<E> {
 
     public static <E> AVLTree<E> join(AVLTree<E> left, AVLTree<E> right) {
         if (left == null) {
-            return right;
+            return right != null ? right : new AVLTree<>();
         }
 
         if (right == null) {

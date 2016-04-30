@@ -173,6 +173,12 @@ public class AVLTreeTest {
     }
 
     @Test
+    public void joinNull() throws Exception {
+        AVLTree<Integer> tree = AVLTree.join(null, null);
+        assertTrue(tree.isEmpty());
+    }
+
+    @Test
     public void joinSimple() throws Exception {
         Integer[] points = {0, 1, 23, 32, 44};
         ArrayList<AVLTree<Integer>> trees = new ArrayList<>();
