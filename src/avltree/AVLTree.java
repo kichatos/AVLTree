@@ -286,13 +286,8 @@ public class AVLTree<E> extends AbstractCollection<E> implements Collection<E> {
             }
         }
 
-        if (left != null) {
-            AVLNode.setNext(left, min);
-        }
-
-        if (right != null) {
-            AVLNode.setNext(max, right);
-        }
+        AVLNode.setNext(left, min);
+        AVLNode.setPrev(right, max);
 
         AVLNode.setRight(left, null);
         AVLNode.setLeft(right, null);

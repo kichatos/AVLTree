@@ -248,6 +248,53 @@ public class AVLTreeTest {
     }
 
     @Test
+    public void retainSingle() throws Exception {
+        Integer elem = 1;
+
+        AVLTree<Integer> tree = new AVLTree<>();
+        tree.add(elem);
+        tree.retainSegment(elem, elem);
+        assertEquals(tree.size(), 1);
+        assertEquals(tree.get(0), elem);
+        for (Integer e : tree) {
+            assertEquals(e, elem);
+        }
+    }
+
+    @Test
+    public void retainNotPresent() throws Exception {
+        AVLTree<Integer> tree = createSimpleTree();
+        tree.retainSegment(-5, 5);
+        assertEquals(tree.size(), 3);
+
+        Integer i = 1;
+        for (Integer e : tree) {
+            assertEquals(e, i++);
+        }
+
+        tree.retainSegment(-30, 2);
+        assertEquals(tree.size(), 2);
+        i = 1;
+        for (Integer e : tree) {
+            assertEquals(e, i++);
+        }
+
+        tree.retainSegment(2, 100);
+        assertEquals(tree.size(), 1);
+        i = 2;
+        for (Integer e : tree) {
+            assertEquals(e, i++);
+        }
+    }
+
+    @Test
+    public void retainEmpty() throws Exception {
+        AVLTree<Integer> tree = new AVLTree<>();
+        tree.retainSegment(-9, 13);
+        assertTrue(tree.isEmpty());
+    }
+
+    @Test
     public void removeOverlappingInterval() throws Exception {
         Integer min = 0;
         Integer max = 1 << 10;
